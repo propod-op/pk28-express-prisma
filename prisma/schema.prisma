@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  password String   @default("")
+  jwt      String?
+  name     String?
+  isAdmin  Boolean  @default(false)
+  paniers  Panier[] // Relation avec les paniers
+}
+
+model Product {
+  id                 Int             @id @default(autoincrement())
+  reference          String?
+  prix               Float?
+  description        String?
+  data_arrivee_stock DateTime        @default(now())
+  vendu              Boolean         @default(false)
+  image1             String?
+  category_id        Int             @default(1) // Relation avec l'ID de la catégorie
+  category           Categorie?      @relation(fields: [category_id], references: [id])
+  panierProducts     PanierProduct[] // Relation avec PanierProduct
+}
+
+model Panier {
+  id             Int             @id @default(autoincrement())
+  createdAt      DateTime        @default(now())
+  userId         Int
+  user           User            @relation(fields: [userId], references: [id])
+  panierProducts PanierProduct[] // Relation avec PanierProduct
+}
+
+model PanierProduct {
+  id        Int     @id @default(autoincrement())
+  panierId  Int
+  productId Int
+  panier    Panier  @relation(fields: [panierId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([panierId, productId]) // Pour assurer l'unicité de chaque produit dans un panier
+}
+
+model Fish {
+  id        Int     @id @default(autoincrement())
+  reference String?
+
+  famille_id  Int?
+  famille     Famille?   @relation(fields: [famille_id], references: [id])
+  category_id Int        @default(1) // Relation avec l'ID de la catégorie
+  category    Categorie? @relation(fields: [category_id], references: [id])
+
+  prix               Float?
+  description        String?
+  data_arrivee_stock DateTime @default(now())
+
+  naissance   DateTime?
+  age         Int?
+  taille      Int?
+  couleurs    Json?
+  eleveur     Int?
+  reservebyId Int       @default(0)
+  vendue      Boolean   @default(false)
+  image1      String?
+}
+
+model Categorie {
+  id      Int       @id @default(autoincrement())
+  name    String?
+  Product Product[]
+  Fish    Fish[]
+}
+
+model Famille {
+  id          Int     @id @default(autoincrement())
+  name        String?
+  description String?
+  Fish        Fish[]
+}
+
+model Post {
+  id        Int     @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean @default(false)
+}
