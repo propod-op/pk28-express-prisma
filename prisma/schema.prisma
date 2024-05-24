@@ -29,7 +29,7 @@ model Product {
   prix               Float?
   description        String?
   data_arrivee_stock DateTime        @default(now())
-  vendu              Boolean         @default(false)
+  stock              Boolean         @default(false)
   image1             String?
   category_id        Int             @default(1) // Relation avec l'ID de la catégorie
   category           Categorie?      @relation(fields: [category_id], references: [id])
@@ -58,10 +58,8 @@ model Fish {
   id        Int     @id @default(autoincrement())
   reference String?
 
-  famille_id  Int?
-  famille     Famille?   @relation(fields: [famille_id], references: [id])
-  category_id Int        @default(1) // Relation avec l'ID de la catégorie
-  category    Categorie? @relation(fields: [category_id], references: [id])
+  famille_id Int?
+  famille    Famille? @relation(fields: [famille_id], references: [id])
 
   prix               Float?
   description        String?
@@ -81,7 +79,6 @@ model Categorie {
   id      Int       @id @default(autoincrement())
   name    String?
   Product Product[]
-  Fish    Fish[]
 }
 
 model Famille {
